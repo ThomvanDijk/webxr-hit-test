@@ -1,0 +1,34 @@
+{
+  "name": "webxr-ar-demo",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "main": "src/index.tsx",
+  "dependencies": {
+    "@react-three/drei": "^4.3.2",
+    "@react-three/fiber": "^6.0.17",
+    "@react-three/xr": "3.0.1",
+    "@types/react": "17.0.4",
+    "@types/react-dom": "17.0.3",
+    "@types/three": "^0.127.1",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-scripts": "4.0.3",
+    "react-three-fiber": "5.0.0",
+    "three": "0.128.0",
+    "troika-3d-text": "0.41.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "set BROWSER=none && react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
