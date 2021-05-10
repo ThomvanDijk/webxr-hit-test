@@ -1,73 +1,50 @@
 import React, { useState, useCallback } from 'react'
 import { ARCanvas, useHitTest, Interactive } from '@react-three/xr'
 import { useResource } from 'react-three-fiber'
-import { Box } from '@react-three/drei'
+import { Box, Ring, Sphere } from '@react-three/drei'
 import uuid from "short-uuid"
 import './styles.css'
 
-function Button() {
+// The Anchor is used as the origin of the scene
+function Anchor(props) {
   const ref = useResource()
-  const [hover, setHover] = useState(false)
-  const [color, setColor] = useState('blue')
-
-  const [items, set] = useState([])
-  const handleClick = useCallback(e => {
-    set(items => [...items, uuid.generate()]), []
-    console.log("onClick!")
-  })
-
-  const onSelect = () => {
-    setColor((Math.random() * 0xffffff) | 0)
-  }
-
   return (
-    <Interactive onHover={() => setHover(true)} onBlur={() => setHover(false)} onSelect={handleClick}>
-      <Box ref={ref} args={[0.1, 0.1, 0.1]} position={[0, 0, -0.8]}>
-        <meshBasicMaterial attach="material" color={color}/>
-      </Box>
-      {items.map((key, index) => (
-        <Spawned key={key} position={[0, index * 0.1, -0.8]} />
-      ))}
-    </Interactive>
+    <Box {...props} ref={ref} args={[0.1, 0.1, 0.1]} >
+      <meshBasicMaterial attach="material" color={'orange'}/>
+    </Box>
   )
 }
 
-function Spawned(props) {
+// The HitTestSphere is placed at the position of the hit from HitTestExample 
+function HitTestSphere(props) {
   return (
-    <mesh {...props}>
-      <sphereGeometry attach="geometry" args={[0.1, 16, 16]} />
-      <meshStandardMaterial attach="material" color="hotpink" transparent />
-    </mesh>
+    <Sphere {...props} attach="geometry" args={[0.1, 16, 16]} >
+      <meshBasicMaterial attach="material" color={'hotpink'} />
+    </Sphere>
   )
 }
 
 function HitTestExample() {
   const ref = useResource()
-  const [color, setColor] = useState('blue')
   const [items, set] = useState([])
 
   useHitTest((hit) => {
     hit.decompose(ref.current.position, ref.current.rotation, ref.current.scale)
   })
 
-  // const onSelect = () => {
-  //   setColor((Math.random() * 0xffffff) | 0)
-  // }
-
   const handleClick = useCallback(e => {
     set(items => [...items, uuid.generate()]), []
-    console.log("onClick!")
   })
 
   return (
     <>
       <Interactive onSelect={handleClick}>
-        <Box ref={ref} args={[0.1, 0.1, 0.1]}>
-          <meshBasicMaterial attach="material" color={color} />
-        </Box>
+        <Sphere ref={ref} attach="geometry" args={[0.2, 32, 32]} >
+          <meshBasicMaterial attach="material" color={'white'} opacity={0.5} />
+        </Sphere>
       </Interactive>
       {items.map((key, index) => (
-        <Spawned key={key} position={ref.current.position} />
+        <HitTestSphere key={key} position={ref.current.position} />
       ))}
     </>
   )
@@ -78,9 +55,8 @@ export function App() {
     <ARCanvas sessionInit={{ requiredFeatures: ['hit-test'] }}>
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
-      <Button position={[0, 0, -0.8]} />
+      <Anchor position={[0, 0, -0.8]} />
       <HitTestExample />
-      {/* <DefaultXRControllers />  Apparently this gives bugs... */}
     </ARCanvas>
   )
 }
