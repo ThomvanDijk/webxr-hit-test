@@ -1,15 +1,19 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, Suspense } from 'react'
 import { ARCanvas, useHitTest, Interactive } from '@react-three/xr'
 import { useResource } from 'react-three-fiber'
-import { Box, Ring, Sphere } from '@react-three/drei'
-import uuid from "short-uuid"
+import { Box, Sphere, useGLTF } from '@react-three/drei'
+import uuid from 'short-uuid'
 import './styles.css'
 
+// For some reason this import doesn't work!
+import reticle from './assets/reticle/reticle.gltf'
+
 // The Anchor is used as the origin of the scene
-function Anchor(props) {
+const Anchor = (props) => {
   const ref = useResource()
+
   return (
-    <Box {...props} ref={ref} args={[0.1, 0.1, 0.1]} >
+    <Box {...props} ref={ref} args={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / 4, Math.PI / 4]}>
       <meshBasicMaterial attach="material" color={'orange'}/>
     </Box>
   )
@@ -25,6 +29,7 @@ function HitTestSphere(props) {
 }
 
 function HitTestExample() {
+  const gltf = useGLTF('reticle.gltf')
   const ref = useResource()
   const [items, set] = useState([])
 
@@ -39,9 +44,10 @@ function HitTestExample() {
   return (
     <>
       <Interactive onSelect={handleClick}>
-        <Sphere ref={ref} attach="geometry" args={[0.2, 32, 32]} >
+        <primitive ref={ref} object={gltf.scene} scale={1}/>
+        {/* <Sphere ref={ref} attach="geometry" args={[0.2, 32, 32]} >
           <meshBasicMaterial attach="material" color={'white'} opacity={0.5} />
-        </Sphere>
+        </Sphere> */}
       </Interactive>
       {items.map((key, index) => (
         <HitTestSphere key={key} position={ref.current.position} />
@@ -56,7 +62,9 @@ export function App() {
       <ambientLight />
       <pointLight position={[10, 10, 10]} />
       <Anchor position={[0, 0, -0.8]} />
-      <HitTestExample />
+      <Suspense fallback={null}>
+        <HitTestExample />
+      </Suspense>
     </ARCanvas>
   )
 }
