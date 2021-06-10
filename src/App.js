@@ -45,9 +45,6 @@ function HitTestExample() {
     <>
       <Interactive onSelect={handleClick}>
         <primitive ref={ref} object={gltf.scene} scale={1}/>
-        {/* <Sphere ref={ref} attach="geometry" args={[0.2, 32, 32]} >
-          <meshBasicMaterial attach="material" color={'white'} opacity={0.5} />
-        </Sphere> */}
       </Interactive>
       {items.map((key, index) => (
         <HitTestSphere key={key} position={ref.current.position} />
