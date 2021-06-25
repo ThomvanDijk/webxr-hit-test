@@ -1,6 +1,7 @@
 {
   "name": "webxr-ar-demo",
   "version": "1.0.0",
+  "_homepage": "https://geedesign.com/test/hittest",
   "description": "",
   "keywords": [],
   "main": "src/index.tsx",
