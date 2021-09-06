@@ -1,53 +1,28 @@
-import React, { useState, useCallback, Suspense } from 'react'
-import { ARCanvas, useHitTest, Interactive } from '@react-three/xr'
-import { useResource } from 'react-three-fiber'
-import { Box, Sphere, useGLTF } from '@react-three/drei'
-import uuid from 'short-uuid'
-import './styles.css'
+import React, { useState, useRef, Suspense } from 'react'
+import { ARCanvas, useHitTest, useInteraction } from '@react-three/xr'
+import { Sphere, useGLTF } from '@react-three/drei'
 
-// For some reason this import doesn't work!
-import reticle from './assets/reticle/reticle.gltf'
-
-// The Anchor is used as the origin of the scene
-const Anchor = (props) => {
-  const ref = useResource()
-
-  return (
-    <Box {...props} ref={ref} args={[0.1, 0.1, 0.1]} rotation={[0, Math.PI / 4, Math.PI / 4]}>
-      <meshBasicMaterial attach="material" color={'orange'}/>
-    </Box>
-  )
-}
-
-// The HitTestSphere is placed at the position of the hit from HitTestExample 
-function HitTestSphere(props) {
-  return (
-    <Sphere {...props} attach="geometry" args={[0.1, 16, 16]} >
-      <meshBasicMaterial attach="material" color={'hotpink'} />
-    </Sphere>
-  )
-}
-
-function HitTestExample() {
-  const gltf = useGLTF('reticle.gltf')
-  const ref = useResource()
+function HitTest() {
+  const reticle = useGLTF('reticle/reticle.gltf')
+  const ref = useRef()
   const [items, set] = useState([])
+  let item_id = 0
 
+  // Hit is the position on a surface where the camera looks at 
   useHitTest((hit) => {
     hit.decompose(ref.current.position, ref.current.rotation, ref.current.scale)
   })
 
-  const handleClick = useCallback(e => {
-    set(items => [...items, uuid.generate()]), []
+  // This function adds a new item, which is just an id, to the items list when the reticle is selected
+  useInteraction(ref, 'onSelect', () => {
+    set([...items, item_id++])
   })
 
   return (
     <>
-      <Interactive onSelect={handleClick}>
-        <primitive ref={ref} object={gltf.scene} scale={1}/>
-      </Interactive>
-      {items.map((key, index) => (
-        <HitTestSphere key={key} position={ref.current.position} />
+      <primitive ref={ref} object={reticle.scene} scale={1}/>
+      {items.map(() => (
+        <Sphere position={ref.current.position} args={[0.1, 16, 16]} />
       ))}
     </>
   )
@@ -56,11 +31,8 @@ function HitTestExample() {
 export function App() {
   return (
     <ARCanvas sessionInit={{ requiredFeatures: ['hit-test'] }}>
-      <ambientLight />
-      <pointLight position={[10, 10, 10]} />
-      <Anchor position={[0, 0, -0.8]} />
       <Suspense fallback={null}>
-        <HitTestExample />
+        <HitTest />
       </Suspense>
     </ARCanvas>
   )
